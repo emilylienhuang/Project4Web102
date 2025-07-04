@@ -42,6 +42,8 @@ function App() {
       setImageUrl(imageUrl); // assuming you're in React
       setTemperament(breed.temperament);
       setBreed(breed.name);
+      setLongevity(breed.life_span);
+      setPurpose(breed.bred_for);
       return { imageUrl, breed };
     } catch (err) {
       console.error(err);
@@ -52,20 +54,23 @@ function App() {
   const [imageUrl, setImageUrl] = useState("");
   const [breed, setBreed] = useState("");
   const [temperament, setTemperament] = useState("");
-
+  const [purpose, setPurpose] = useState("");
+  const [longevity, setLongevity] = useState("");
   return (
     <>
       <h1>Puppy Pals</h1>
 
-      <div className="card">
-        <button onClick={fetchDogWithDetails}>Generate Random Photo</button>
-      </div>
       <div className="attributes-list">
         <h4>Breed: {breed}</h4>
-        <h4>Temparment: {temperament}</h4>
+        <h4>Temperament: {temperament}</h4>
+        <h4>Lifespan: {longevity}</h4>
+        <h4>Purpose: {purpose}</h4>
       </div>
       <div className="dog-photo">
         {imageUrl && <img src={imageUrl} alt="Random Dog" width="300" />}
+      </div>
+      <div className="card">
+        <button onClick={fetchDogWithDetails}>Generate Random Photo</button>
       </div>
     </>
   );
