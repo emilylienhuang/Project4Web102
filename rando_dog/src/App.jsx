@@ -34,6 +34,7 @@ function App() {
         breed = breedsWithImages[randomIndex];
         referenceImageId = breed.reference_image_id;
         count += 1;
+        console.log(filters);
       } while ((!referenceImageId || !dogMatchesFilters(breed)) && count < 10);
 
       // Step 2: Get the actual image URL
@@ -72,7 +73,7 @@ function App() {
       const field = dog[filter.type];
       if (!field) return false;
 
-      return field.toLowerCase().includes(filter.value.toLowerCase());
+      return !field.toLowerCase().includes(filter.value.toLowerCase().trim());
     });
   }
 
