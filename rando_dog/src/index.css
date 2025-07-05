@@ -66,3 +66,33 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+.filter-bar {
+  width: 200px;
+  padding: 1rem;
+  background-color: #f8f8f8;
+  border-right: 1px solid #ddd;
+}
+
+.filter-button {
+  display: block;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border: none;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.filter-button:hover {
+  background-color: #d0d0d0;
+}

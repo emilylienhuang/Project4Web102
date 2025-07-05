@@ -3,11 +3,14 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 import axios from "axios";
+import FilterBar from "../components/FilterBar";
 
 function App() {
+  const removeFilter = (indexToRemove) => {
+    setFilters((prev) => prev.filter((_, i) => i !== indexToRemove));
+  };
+
   async function fetchDogWithDetails() {
-    const url =
-      "https://api.thedogapi.com/v1/images/search?has_breeds=true&limit=1";
     const headers = {
       "x-api-key":
         "live_g3P7lpMeevZvxyEyihMTLJMTaod4XKxBYV3ptsFO3ItprrqeRLpadbfEXnytsSIG",
@@ -23,32 +26,54 @@ function App() {
         (b) => b.reference_image_id
       );
 
-      // ✅ Pick a random breed from the filtered list
-      const randomIndex = Math.floor(Math.random() * breedsWithImages.length);
-      const breed = breedsWithImages[randomIndex];
-      const referenceImageId = breed.reference_image_id;
+      let breed, referenceImageId;
+      let count = 0;
+
+      do {
+        const randomIndex = Math.floor(Math.random() * breedsWithImages.length);
+        breed = breedsWithImages[randomIndex];
+        referenceImageId = breed.reference_image_id;
+        count += 1;
+      } while ((!referenceImageId || !dogMatchesFilters(breed)) && count < 10);
 
       // Step 2: Get the actual image URL
       const imageRes = await axios.get(
         `https://api.thedogapi.com/v1/images/${referenceImageId}`,
         { headers }
       );
+
       const imageUrl = imageRes.data.url;
 
-      console.log("✅ Image URL:", imageUrl);
-      console.log("🐶 Name:", breed.name);
-      console.log("🧬 Temperament:", breed.temperament);
-
-      setImageUrl(imageUrl); // assuming you're in React
+      setImageUrl(imageUrl);
       setTemperament(breed.temperament);
       setBreed(breed.name);
       setLongevity(breed.life_span);
       setPurpose(breed.bred_for);
+
       return { imageUrl, breed };
     } catch (err) {
       console.error(err);
       return null;
     }
+  }
+
+  const [filters, setFilters] = useState([]);
+
+  function addFilter(newFilter) {
+    setFilters((prev) => [...prev, newFilter]);
+  }
+
+  function clearFilters() {
+    setFilters([]);
+  }
+
+  function dogMatchesFilters(dog) {
+    return filters.every((filter) => {
+      const field = dog[filter.type];
+      if (!field) return false;
+
+      return field.toLowerCase().includes(filter.value.toLowerCase());
+    });
   }
 
   const [imageUrl, setImageUrl] = useState("");
@@ -58,19 +83,40 @@ function App() {
   const [longevity, setLongevity] = useState("");
   return (
     <>
-      <h1>Puppy Pals</h1>
+      <div className="app-container">
+        <div className="main-content">
+          <h1>Puppy Pals</h1>
 
-      <div className="attributes-list">
-        <h4>Breed: {breed}</h4>
-        <h4>Temperament: {temperament}</h4>
-        <h4>Lifespan: {longevity}</h4>
-        <h4>Purpose: {purpose}</h4>
-      </div>
-      <div className="dog-photo">
-        {imageUrl && <img src={imageUrl} alt="Random Dog" width="300" />}
-      </div>
-      <div className="card">
-        <button onClick={fetchDogWithDetails}>Generate Random Photo</button>
+          <div className="attributes-list">
+            <button onClick={() => addFilter({ type: "name", value: breed })}>
+              {breed}
+            </button>
+            <button
+              onClick={() =>
+                addFilter({ type: "temperament", value: temperament })
+              }
+            >
+              {temperament}
+            </button>
+            <button
+              onClick={() => addFilter({ type: "life_span", value: longevity })}
+            >
+              {longevity}
+            </button>
+            <button
+              onClick={() => addFilter({ type: "bred_for", value: purpose })}
+            >
+              {purpose}
+            </button>
+          </div>
+          <div className="dog-photo">
+            {imageUrl && <img src={imageUrl} alt="Random Dog" width="300" />}
+          </div>
+          <div className="card">
+            <button onClick={fetchDogWithDetails}>Generate Random Photo</button>
+          </div>
+        </div>
+        <FilterBar filters={filters} removeFilter={removeFilter} />
       </div>
     </>
   );
